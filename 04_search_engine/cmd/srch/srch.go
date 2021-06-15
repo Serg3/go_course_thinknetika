@@ -3,22 +3,29 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go_course_thinknetika/04_search_engine/pkg/crawler"
 	"go_course_thinknetika/04_search_engine/pkg/crawler/spider"
+	"go_course_thinknetika/04_search_engine/pkg/index"
 	"log"
-	"strings"
 )
+
+// Struct 'search' is used
+// for a more convenient representation
+// of search's parameters
+type search struct {
+	scanner *spider.Service
+	sites   []string
+	depth   int
+	storage *index.Storage
+}
 
 func main() {
 	param := flag.String("s", "", "word for search")
 	flag.Parse()
 	if *param != "" {
-		docs := scan()
-		fmt.Println("Search result:")
-		for _, doc := range docs {
-			if strings.Contains(strings.ToLower(doc.Title), strings.ToLower(*param)) {
-				fmt.Println(doc.URL, doc.Title)
-			}
+		docs := scan().Search(param)
+		fmt.Println("Search results:")
+		for _, d := range docs {
+			fmt.Println(d)
 		}
 	} else {
 		flag.PrintDefaults()
@@ -27,18 +34,26 @@ func main() {
 
 // Function scan() uses package 'crawler'
 // to search through Go sites by word
-// and returs []crawler.Document result
-func scan() (docs []crawler.Document) {
-	scn := spider.New()
-	const depth = 2
-	urls := []string{"https://golang.org", "https://go.dev"}
-	for _, url := range urls {
-		res, err := scn.Scan(url, depth)
+// and returs sorted *index.Storage result
+func scan() *index.Storage {
+	s := new()
+	for _, url := range s.sites {
+		res, err := s.scanner.Scan(url, s.depth)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
-		docs = append(docs, res...)
+		s.storage.Append(res)
 	}
-	return docs
+	s.storage.Sort()
+	return s.storage
+}
+
+func new() *search {
+	s := search{}
+	s.sites = []string{"https://go.dev", "https://golang.org/"}
+	s.depth = 2
+	s.scanner = spider.New()
+	s.storage = index.New()
+	return &s
 }
