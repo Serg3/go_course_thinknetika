@@ -3,6 +3,7 @@ package index
 import (
 	"fmt"
 	"go_course_thinknetika/06_search_engine/pkg/crawler"
+	"go_course_thinknetika/06_search_engine/pkg/storage"
 	"hash/fnv"
 	"sort"
 	"strings"
@@ -21,11 +22,35 @@ type Storage struct {
 
 // New creates a new storage instance
 func New() *Storage {
+	data, err := storage.Load()
+
+	if err != nil {
+		return &Storage{
+			counter: 0,
+			docs:    make(crwDocs, 0),
+			ind:     make(map[uint32][]int),
+		}
+	}
+
+	fmt.Printf("Storage file was successfully loaded.\n\n")
 	return &Storage{
 		counter: 0,
-		docs:    make(crwDocs, 0),
+		docs:    data,
 		ind:     make(map[uint32][]int),
 	}
+}
+
+func (s *Storage) Empty() bool {
+	return len(s.docs) <= 0
+}
+
+func (s *Storage) Save() error {
+	err := storage.Save(s.docs)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Append adds document to the storage
@@ -34,7 +59,6 @@ func (s *Storage) Append(docs []crawler.Document) {
 		s.counter++
 		d.ID = s.counter
 		s.docs = append(s.docs, d)
-		s.index(d.ID, d.Title)
 	}
 }
 
@@ -57,6 +81,12 @@ func (s *Storage) Search(param *string) []string {
 	}
 
 	return res
+}
+
+func (s *Storage) Index() {
+	for _, d := range s.docs {
+		s.index(d.ID, d.Title)
+	}
 }
 
 func (s *Storage) Sort() {

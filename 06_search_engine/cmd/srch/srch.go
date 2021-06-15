@@ -21,32 +21,32 @@ type search struct {
 func main() {
 	param := flag.String("s", "", "word for search")
 	flag.Parse()
-	if *param != "" {
-		docs := scan().Search(param)
-		fmt.Println("Search results:")
-		for _, d := range docs {
-			fmt.Println(d)
-		}
-	} else {
+	if *param == "" {
 		flag.PrintDefaults()
+		return
 	}
-}
 
-// Function scan() uses package 'crawler'
-// to search through Go sites by word
-// and returs sorted *index.Storage result
-func scan() *index.Storage {
 	s := new()
-	for _, url := range s.sites {
-		res, err := s.scanner.Scan(url, s.depth)
-		if err != nil {
-			log.Println(err)
-			continue
+	if s.storage.Empty() {
+		fmt.Printf("Storage is empty. Performing a new scan...\n\n")
+		for _, url := range s.sites {
+			res, err := s.scanner.Scan(url, s.depth)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			s.storage.Append(res)
 		}
-		s.storage.Append(res)
+		s.storage.Save()
 	}
+	s.storage.Index()
 	s.storage.Sort()
-	return s.storage
+
+	docs := s.storage.Search(param)
+	fmt.Printf("Search results:\n\n")
+	for _, d := range docs {
+		fmt.Println(d)
+	}
 }
 
 func new() *search {
