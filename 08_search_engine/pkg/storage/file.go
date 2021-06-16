@@ -5,22 +5,19 @@ import (
 	"encoding/json"
 	"go_course_thinknetika/08_search_engine/pkg/crawler"
 	"io"
-	"os"
 )
 
-const file = "scan_result.txt"
+type Filestore struct{}
 
-func Load() ([]crawler.Document, error) {
-	f, err := os.Open(file)
+func New() *Filestore {
+	return &Filestore{}
+}
+
+func (f *Filestore) Load(src io.Reader) ([]crawler.Document, error) {
+	b, err := read(src)
 	if err != nil {
 		return nil, err
 	}
-
-	b, err := read(f)
-	if err != nil {
-		return nil, err
-	}
-	f.Close()
 
 	crwDocs := make([]crawler.Document, 0)
 
@@ -32,22 +29,16 @@ func Load() ([]crawler.Document, error) {
 	return crwDocs, nil
 }
 
-func Save(crwDocs []crawler.Document) error {
-	f, err := os.Create(file)
-	if err != nil {
-		return err
-	}
-
+func (f *Filestore) Save(src io.Writer, crwDocs []crawler.Document) error {
 	b, err := json.Marshal(crwDocs)
 	if err != nil {
 		return err
 	}
 
-	err = write(f, b)
+	err = write(src, b)
 	if err != nil {
 		return err
 	}
-	f.Close()
 
 	return nil
 }

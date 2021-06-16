@@ -3,7 +3,6 @@ package index
 import (
 	"fmt"
 	"go_course_thinknetika/08_search_engine/pkg/crawler"
-	"go_course_thinknetika/08_search_engine/pkg/storage"
 	"hash/fnv"
 	"sort"
 	"strings"
@@ -11,50 +10,34 @@ import (
 
 type crwDocs []crawler.Document
 
-// Struct 'Storage' is used
+// Struct 'Store' is used
 // for a more convenient representation
-// of storages's parameters
-type Storage struct {
+// of indexed storage's parameters
+type Store struct {
 	counter int
 	docs    crwDocs
 	ind     map[uint32][]int
 }
 
 // New creates a new storage instance
-func New() *Storage {
-	data, err := storage.Load()
-
-	if err != nil {
-		return &Storage{
-			counter: 0,
-			docs:    make(crwDocs, 0),
-			ind:     make(map[uint32][]int),
-		}
-	}
-
-	fmt.Printf("Storage file was successfully loaded.\n\n")
-	return &Storage{
+func New() *Store {
+	return &Store{
 		counter: 0,
-		docs:    data,
+		docs:    make(crwDocs, 0),
 		ind:     make(map[uint32][]int),
 	}
 }
 
-func (s *Storage) Empty() bool {
+func (s *Store) Empty() bool {
 	return len(s.docs) <= 0
 }
 
-func (s *Storage) Save() error {
-	err := storage.Save(s.docs)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (s *Store) Docs() []crawler.Document {
+	return s.docs
 }
 
 // Append adds document to the storage
-func (s *Storage) Append(docs []crawler.Document) {
+func (s *Store) Append(docs []crawler.Document) {
 	for _, d := range docs {
 		s.counter++
 		d.ID = s.counter
@@ -66,7 +49,7 @@ func (s *Storage) Append(docs []crawler.Document) {
 // by the incoming param
 // in the indexed storage
 // and returns formatted result
-func (s *Storage) Search(param *string) []string {
+func (s *Store) Search(param *string) []string {
 	var d crawler.Document
 
 	res := make([]string, 0)
@@ -83,17 +66,17 @@ func (s *Storage) Search(param *string) []string {
 	return res
 }
 
-func (s *Storage) Index() {
+func (s *Store) Index() {
 	for _, d := range s.docs {
 		s.index(d.ID, d.Title)
 	}
 }
 
-func (s *Storage) Sort() {
+func (s *Store) Sort() {
 	sort.Sort(s.docs)
 }
 
-func (s *Storage) binarySearch(id, l, r int) crawler.Document {
+func (s *Store) binarySearch(id, l, r int) crawler.Document {
 	if r < l {
 		return crawler.Document{}
 	}
@@ -111,7 +94,7 @@ func (s *Storage) binarySearch(id, l, r int) crawler.Document {
 	}
 }
 
-func (s *Storage) index(id int, title string) {
+func (s *Store) index(id int, title string) {
 	var h uint32
 
 	arr := strings.Split(title, " ")
