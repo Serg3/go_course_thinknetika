@@ -32,12 +32,12 @@ func (s *Store) Empty() bool {
 	return len(s.docs) <= 0
 }
 
-func (s *Store) Docs() []crawler.Document {
+func (s *Store) Docs() crwDocs {
 	return s.docs
 }
 
 // Append adds document to the storage
-func (s *Store) Append(docs []crawler.Document) {
+func (s *Store) Append(docs crwDocs) {
 	for _, d := range docs {
 		s.counter++
 		d.ID = s.counter
