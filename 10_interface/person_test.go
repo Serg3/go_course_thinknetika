@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestOldest(t *testing.T) {
+func TestOldestAge(t *testing.T) {
 	c1 := Customer{age: 34}
 	c2 := Customer{age: 43}
 	e3 := Employee{age: 27}
@@ -46,19 +46,19 @@ func TestOldest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Oldest(tt.args.p...)
+			got, err := OldestAge(tt.args.p...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Oldest() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("OldestAge() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Oldest() = %v, want %v", got, tt.want)
+				t.Errorf("OldestAge() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestOldestPerson(t *testing.T) {
+func TestOldestObject(t *testing.T) {
 	p1 := Customer{age: 34}
 	p2 := Customer{age: 43}
 	p3 := Employee{age: 27}
@@ -105,13 +105,13 @@ func TestOldestPerson(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OldestPerson(tt.args.args...)
+			got, err := OldestObject(tt.args.args...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("OldestPerson() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("OldestObject() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("OldestPerson() = %v, want %v", got, tt.want)
+				t.Errorf("OldestObject() = %v, want %v", got, tt.want)
 			}
 		})
 	}
