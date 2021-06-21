@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestOldestAge(t *testing.T) {
+func TestHighestAge(t *testing.T) {
 	c1 := Customer{age: 34}
 	c2 := Customer{age: 43}
 	e3 := Employee{age: 27}
@@ -20,45 +20,37 @@ func TestOldestAge(t *testing.T) {
 		p []Person
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    int
-		wantErr bool
+		name string
+		args args
+		want int
 	}{
 		{
-			name:    "with one person",
-			args:    args{p1},
-			want:    34,
-			wantErr: false,
+			name: "with one person",
+			args: args{p1},
+			want: 34,
 		},
 		{
-			name:    "with several persons",
-			args:    args{p2},
-			want:    43,
-			wantErr: false,
+			name: "with several persons",
+			args: args{p2},
+			want: 43,
 		},
 		{
-			name:    "without persons",
-			args:    args{},
-			want:    0,
-			wantErr: true,
+			name: "without persons",
+			args: args{},
+			want: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OldestAge(tt.args.p...)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("OldestAge() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got := HighestAge(tt.args.p...)
 			if got != tt.want {
-				t.Errorf("OldestAge() = %v, want %v", got, tt.want)
+				t.Errorf("HighestAge() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestOldestObject(t *testing.T) {
+func TestEldestPerson(t *testing.T) {
 	p1 := Customer{age: 34}
 	p2 := Customer{age: 43}
 	p3 := Employee{age: 27}
@@ -73,45 +65,36 @@ func TestOldestObject(t *testing.T) {
 		args []interface{}
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    interface{}
-		wantErr bool
+		name string
+		args args
+		want interface{}
 	}{
 		{
-			name:    "with one person",
-			args:    args{i1},
-			want:    p1,
-			wantErr: false,
+			name: "with one person",
+			args: args{i1},
+			want: p1,
 		},
 		{
-			name:    "with several persons (customer oldest)",
-			args:    args{i2},
-			want:    p2,
-			wantErr: false,
+			name: "with several persons (customer oldest)",
+			args: args{i2},
+			want: p2,
 		},
 		{
-			name:    "with several persons (employee oldest)",
-			args:    args{i3},
-			want:    p4,
-			wantErr: false,
+			name: "with several persons (employee oldest)",
+			args: args{i3},
+			want: p4,
 		},
 		{
-			name:    "without persons",
-			args:    args{},
-			want:    nil,
-			wantErr: true,
+			name: "without persons",
+			args: args{},
+			want: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OldestObject(tt.args.args...)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("OldestObject() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got := EldestPerson(tt.args.args...)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("OldestObject() = %v, want %v", got, tt.want)
+				t.Errorf("EldestPerson() = %v, want %v", got, tt.want)
 			}
 		})
 	}

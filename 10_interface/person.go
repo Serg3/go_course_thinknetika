@@ -1,7 +1,6 @@
 package person
 
 import (
-	"errors"
 	"io"
 	"sort"
 )
@@ -26,23 +25,23 @@ func (e *Employee) Age() int {
 	return e.age
 }
 
-// OldestAge() returns the age
+// HighestAge() returns the age
 // of the oldest among
 // employees and customers
-func OldestAge(p ...Person) (int, error) {
+func HighestAge(p ...Person) int {
 	if p == nil {
-		return 0, errors.New("no argsuments were provided")
+		return 0
 	}
 	sort.Slice(p, func(i, j int) bool { return p[i].Age() >= p[j].Age() })
-	return p[0].Age(), nil
+	return p[0].Age()
 }
 
-// OldestObject() returns the interface
+// EldestPerson() returns the interface
 // of the oldest among
 // employees and customers
-func OldestObject(args ...interface{}) (interface{}, error) {
+func EldestPerson(args ...interface{}) interface{} {
 	if args == nil {
-		return nil, errors.New("no argsuments were provided")
+		return nil
 	}
 	max := 0
 	var i interface{}
@@ -61,7 +60,7 @@ func OldestObject(args ...interface{}) (interface{}, error) {
 		}
 	}
 
-	return i, nil
+	return i
 }
 
 // Print() passes to io.Writer
