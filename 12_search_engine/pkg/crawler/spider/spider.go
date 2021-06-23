@@ -3,14 +3,10 @@
 package spider
 
 import (
-	"log"
 	"net/http"
 	"strings"
-	"sync"
 
 	"golang.org/x/net/html"
-
-	"go_course_thinknetika/12_search_engine/pkg/crawler"
 )
 
 // Service - служба поискового робота.
@@ -27,49 +23,49 @@ func New() *Service {
 //
 // Функция реализует шаблон Workers Pool для ограничения количества одновременно
 // запущенных потоков сканирования.
-func (s *Service) BatchScan(urls []string, depth int, workers int) (<-chan crawler.Document, <-chan error) {
-	chURLs := make(chan string)          // канал входных данных (адреса сайтов)
-	chOut := make(chan crawler.Document) // канал выходных данных (документов)
-	chErr := make(chan error)            // канал ошибок
-	var wg sync.WaitGroup
-	wg.Add(workers)
+// func (s *Service) BatchScan(urls []string, depth int, workers int) (<-chan crawler.Document, <-chan error) {
+// 	chURLs := make(chan string)          // канал входных данных (адреса сайтов)
+// 	chOut := make(chan crawler.Document) // канал выходных данных (документов)
+// 	chErr := make(chan error)            // канал ошибок
+// 	var wg sync.WaitGroup
+// 	wg.Add(workers)
 
-	// пул рабочих потоков
-	for i := 0; i < workers; i++ {
-		go func() {
-			defer wg.Done()
-			for url := range chURLs {
-				data, err := s.Scan(url, depth)
-				if err != nil {
-					log.Println("ошибка:", err)
-					chErr <- err
-					return
-				}
-				for _, doc := range data {
-					log.Println("отсканирован документ:", doc)
-					chOut <- doc
-				}
-			}
-		}()
-	}
-	go func() {
-		wg.Wait()
-		log.Println("закрываются каналы ошибок и выходных данных")
-		close(chErr)
-		close(chOut)
-	}()
+// 	// пул рабочих потоков
+// 	for i := 0; i < workers; i++ {
+// 		go func() {
+// 			defer wg.Done()
+// 			for url := range chURLs {
+// 				data, err := s.Scan(url, depth)
+// 				if err != nil {
+// 					log.Println("ошибка:", err)
+// 					chErr <- err
+// 					return
+// 				}
+// 				for _, doc := range data {
+// 					log.Println("отсканирован документ:", doc)
+// 					chOut <- doc
+// 				}
+// 			}
+// 		}()
+// 	}
+// 	go func() {
+// 		wg.Wait()
+// 		log.Println("закрываются каналы ошибок и выходных данных")
+// 		close(chErr)
+// 		close(chOut)
+// 	}()
 
-	// задания для рабочих потоков
-	go func() {
-		for _, url := range urls {
-			chURLs <- url
-		}
-		log.Println("закрывается канал ссылок")
-		close(chURLs)
-	}()
+// 	// задания для рабочих потоков
+// 	go func() {
+// 		for _, url := range urls {
+// 			chURLs <- url
+// 		}
+// 		log.Println("закрывается канал ссылок")
+// 		close(chURLs)
+// 	}()
 
-	return chOut, chErr
-}
+// 	return chOut, chErr
+// }
 
 // Scan осуществляет рекурсивный обход ссылок сайта, указанного в URL,
 // с учётом глубины перехода по ссылкам, переданной в depth.
