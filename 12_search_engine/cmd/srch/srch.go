@@ -47,14 +47,12 @@ func main() {
 
 	if s.index.Empty() {
 		fmt.Printf("Storage is empty. Performing a new scan...\n\n")
-		for _, url := range s.sites {
-			res, err := s.scanner.Scan(url, s.depth)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			s.index.Append(res)
+		const workers = 10
+		res, err := s.scanner.Scan(s.sites, s.depth, workers)
+		if err != nil {
+			log.Println(err)
 		}
+		s.index.Append(res)
 	}
 	s.index.Index()
 	s.index.Sort()
