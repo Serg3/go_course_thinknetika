@@ -8,13 +8,13 @@ import (
 
 const maxScore = 11
 
-func player(c chan string, wg *sync.WaitGroup, p string) {
+func player(c chan string, wg *sync.WaitGroup, name string) {
 	for {
 		s := <-c
 
 		if s == "stop" {
 			wg.Done()
-			c <- p
+			c <- name
 			return
 		}
 		if s != "begin" && rand.Intn(100)%5 == 0 {
@@ -29,13 +29,13 @@ func player(c chan string, wg *sync.WaitGroup, p string) {
 		}
 
 		c <- s
-		fmt.Printf("%s: %s!\n", p, s)
+		fmt.Printf("%s: %s!\n", name, s)
 	}
 }
 
 func main() {
 	p1, p2 := "Biba", "Boba"
-	var win string
+	var winner string
 	res := map[string]int{
 		p1: 0,
 		p2: 0,
@@ -52,16 +52,16 @@ func main() {
 		game <- "begin"
 		wg.Wait()
 
-		los := <-game
-		if los == p1 {
-			win = p2
+		loser := <-game
+		if loser == p1 {
+			winner = p2
 		} else {
-			win = p1
+			winner = p1
 		}
-		res[win]++
-		fmt.Printf("-= Goal! %s +1 =-\n", win)
+		res[winner]++
+		fmt.Printf("-= Goal! %s +1 =-\n", winner)
 		fmt.Printf("%s %d : %d %s\n\n", p1, res[p1], res[p2], p2)
 	}
 
-	fmt.Printf("-= Match is over! %s wins! =-\n", win)
+	fmt.Printf("-= Match is over! %s wins! =-\n", winner)
 }
