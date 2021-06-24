@@ -3,8 +3,11 @@
 package spider
 
 import (
+	"go_course_thinknetika/12_search_engine/pkg/crawler"
+	"log"
 	"net/http"
 	"strings"
+	"sync"
 
 	"golang.org/x/net/html"
 )
@@ -84,6 +87,68 @@ func New() *Service {
 
 // 	return data, nil
 // }
+
+// Scan осуществляет рекурсивный обход ссылок сайта, указанного в sites,
+// с учётом глубины перехода по ссылкам, переданной в depth,
+// и заданного количества потоков в workers.
+func (s *Service) Scan(sites []string, depth int, workers int) (res []crawler.Document, chErr chan error) {
+	chSites := make(chan string)
+	chRes := make(chan crawler.Document)
+	chErr = make(chan error)
+	var wg sync.WaitGroup
+	wg.Add(workers)
+
+	for i := 0; i < workers; i++ {
+		go func() {
+			defer wg.Done()
+			for url := range chSites {
+				data, err := scan(url, depth)
+				if err != nil {
+					log.Println(err)
+					chErr <- err
+					return
+				}
+				for _, doc := range data {
+					chRes <- doc
+				}
+			}
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(chErr)
+		close(chRes)
+	}()
+
+	go func() {
+		for _, url := range sites {
+			chSites <- url
+		}
+		close(chSites)
+	}()
+
+	for d := range chRes {
+		res = append(res, d)
+	}
+	return res, chErr
+}
+
+func scan(url string, depth int) (data []crawler.Document, err error) {
+	pages := make(map[string]string)
+
+	parse(url, url, depth, pages)
+
+	for url, title := range pages {
+		item := crawler.Document{
+			URL:   url,
+			Title: title,
+		}
+		data = append(data, item)
+	}
+
+	return data, nil
+}
 
 // parse рекурсивно обходит ссылки на странице, переданной в url.
 // Глубина рекурсии задаётся в depth.
