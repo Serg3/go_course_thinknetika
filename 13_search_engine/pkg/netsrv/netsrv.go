@@ -9,6 +9,18 @@ import (
 	"strings"
 )
 
+type SearchParams struct {
+	urls  []string
+	depth int
+}
+
+func New(urls []string, depth int) SearchParams {
+	sp := SearchParams{}
+	sp.urls = urls
+	sp.depth = depth
+	return sp
+}
+
 // Listener accepts two parameters
 // for address (string) and port (string)
 // and returns listener of the local system.
@@ -17,20 +29,21 @@ func Listener(network, address string) (net.Listener, error) {
 }
 
 // Searcher performs handling of incoming connections
-// from the listener given to the function
+// from the listener and parameters SearchParams
+// given to the function
 // and returns a search result from scanned sites
 // by incoming word from the reader.
-func Searcher(listener net.Listener) {
+func Searcher(listener net.Listener, sp SearchParams) {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Fatal(err)
 		}
-		go handler(conn)
+		go handler(conn, sp)
 	}
 }
 
-func handler(conn net.Conn) {
+func handler(conn net.Conn, sp SearchParams) {
 	var docs []crawler.Document
 	defer conn.Close()
 
@@ -45,7 +58,7 @@ func handler(conn net.Conn) {
 		if len(msg) > 0 {
 			if len(docs) == 0 {
 				conn.Write([]byte("Buffer is empty. Performing a new scan...\n"))
-				docs = scan()
+				docs = scan(sp)
 			}
 			conn.Write([]byte("Search result:\n"))
 			for _, doc := range docs {
@@ -65,12 +78,10 @@ func handler(conn net.Conn) {
 // Function scan() uses package 'crawler'
 // to search through Go sites by word
 // and returs []crawler.Document result
-func scan() (docs []crawler.Document) {
+func scan(sp SearchParams) (docs []crawler.Document) {
 	scn := spider.New()
-	const depth = 2
-	urls := []string{"https://golang.org", "https://go.dev"}
-	for _, url := range urls {
-		res, err := scn.Scan(url, depth)
+	for _, url := range sp.urls {
+		res, err := scn.Scan(url, sp.depth)
 		if err != nil {
 			log.Println(err)
 			continue
