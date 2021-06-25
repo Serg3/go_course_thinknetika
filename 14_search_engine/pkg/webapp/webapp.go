@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var r *mux.Router
+
 // cache for using scan() only once
 // the program starts
 var crwDocs []crawler.Document
@@ -29,9 +31,9 @@ func PerformScan(urls []string, depth int) {
 // ListenAndServe listens all TCP network and address ':8080',
 // calls Serve to handle requests on incoming connections.
 func ListenAndServe() {
-	mux := mux.NewRouter()
-	mux.HandleFunc("/{source}", diHandler).Methods(http.MethodGet)
-	http.ListenAndServe(":8080", mux)
+	r = mux.NewRouter()
+	r.HandleFunc("/{source}", diHandler).Methods(http.MethodGet)
+	http.ListenAndServe(":8080", r)
 }
 
 // HTTP handler of /docs and /index routes
@@ -39,7 +41,11 @@ func ListenAndServe() {
 func diHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	if vars["source"] != "docs" && vars["source"] != "index" {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	if len(crwDocs) == 0 {
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
