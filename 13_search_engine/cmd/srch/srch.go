@@ -6,11 +6,9 @@ import (
 )
 
 func main() {
-	l, err := netsrv.Listener("tcp4", ":8000")
+	err := netsrv.ListenAndSearch([]string{"https://golang.org", "https://go.dev"}, 2)
+	// errors handler from net service
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	sp := netsrv.New([]string{"https://golang.org", "https://go.dev"}, 2)
-	netsrv.Searcher(l, sp)
 }

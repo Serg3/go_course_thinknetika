@@ -14,36 +14,44 @@ type SearchParams struct {
 	depth int
 }
 
-func New(urls []string, depth int) SearchParams {
+// ListenAndSearch accepts two parameters for URLs ([]string) and depth (int),
+// performs a new scan of provided sites with specific depth
+// and listen "tcp" network addresses on port ":8000".
+// Returns error if something went wrong with network connection.
+func ListenAndSearch(urls []string, depth int) error {
 	sp := SearchParams{}
 	sp.urls = urls
 	sp.depth = depth
-	return sp
+
+	l, err := net.Listen("tcp", ":8000")
+	if err != nil {
+		return err
+	}
+
+	err = handler(l, sp)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// Listener accepts two parameters
-// for address (string) and port (string)
-// and returns listener of the local system.
-func Listener(network, address string) (net.Listener, error) {
-	return net.Listen(network, address)
-}
-
-// Searcher performs handling of incoming connections
+// Handler performs handling of incoming connections
 // from the listener and parameters SearchParams
 // given to the function
-// and returns a search result from scanned sites
+// and provides a search result from scanned sites
 // by incoming word from the reader.
-func Searcher(listener net.Listener, sp SearchParams) {
+func handler(listener net.Listener, sp SearchParams) error {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		go handler(conn, sp)
+		go searcher(conn, sp)
 	}
 }
 
-func handler(conn net.Conn, sp SearchParams) {
+func searcher(conn net.Conn, sp SearchParams) {
 	var docs []crawler.Document
 	defer conn.Close()
 
