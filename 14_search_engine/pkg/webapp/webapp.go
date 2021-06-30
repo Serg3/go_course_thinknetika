@@ -3,7 +3,6 @@ package webapp
 import (
 	"fmt"
 	"go_course_thinknetika/14_search_engine/pkg/crawler"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -16,23 +15,22 @@ var r *mux.Router
 func ListenAndServe(address string, docs *[]crawler.Document, paths map[string]bool) error {
 	r = mux.NewRouter()
 	r.HandleFunc("/{source}", func(w http.ResponseWriter, r *http.Request) {
-		diHandler(w, r, docs, paths)
+		handler(w, r, docs, paths)
 	}).Methods(http.MethodGet)
 	return http.ListenAndServe(address, r)
 }
 
 // HTTP handler of /docs and /index routes
 // returns to the client a content of []crawler.Document.
-func diHandler(w http.ResponseWriter, r *http.Request, docs *[]crawler.Document, paths map[string]bool) {
+func handler(w http.ResponseWriter, r *http.Request, docs *[]crawler.Document, paths map[string]bool) {
 	vars := mux.Vars(r)
 	if !paths[vars["source"]] {
 		w.WriteHeader(http.StatusNotFound) // or http.StatusMethodNotAllowed
 		return
 	}
 	if len(*docs) == 0 {
-		log.Println("docs are not ready")
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-	fmt.Fprintf(w, "<html><body><div>%v</div></body></html>", docs)
+	fmt.Fprintf(w, "<html><body><div>%v</div></body></html>", *docs)
 }
