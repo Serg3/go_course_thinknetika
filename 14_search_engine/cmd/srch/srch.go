@@ -13,11 +13,7 @@ func main() {
 		docs = scan([]string{"https://golang.org", "https://go.dev"}, 2)
 	}()
 
-	paths := map[string]bool{
-		"docs":  true,
-		"index": true,
-	}
-	err := webapp.ListenAndServe(":8000", &docs, paths)
+	err := webapp.ListenAndServe(":8000", &docs)
 	if err != nil {
 		log.Fatal(err)
 	}
