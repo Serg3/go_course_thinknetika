@@ -29,18 +29,11 @@ func Test_crwDocs_docsHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	r.ServeHTTP(rr, req)
 	if rr.Code != http.StatusNoContent {
-		t.Errorf("ncorrect code: get %d, want %d", rr.Code, http.StatusNoContent)
+		t.Errorf("incorrect code: get %d, want %d", rr.Code, http.StatusNoContent)
 	}
 
 	var docsView string
 	crw.docs = []crawler.Document{
-		{
-			ID:    0,
-			URL:   "https://golang.org/pkg",
-			Title: "src - The Go Programming Language",
-		},
-	}
-	wantDocs := []crawler.Document{
 		{
 			ID:    0,
 			URL:   "https://golang.org/pkg",
@@ -56,13 +49,13 @@ func Test_crwDocs_docsHandler(t *testing.T) {
 	}
 	resp := rr.Result()
 	body, _ := io.ReadAll(resp.Body)
-	get := string(body)
-	for i, d := range wantDocs {
+	got := string(body)
+	for i, d := range crw.docs {
 		docsView += "<p>" + fmt.Sprint(i, ": ") + d.Title + "</p>"
 	}
 	want := "<html><body><div>" + docsView + "</div></body></html>"
-	if get != want {
-		t.Errorf("incorrect body: get %v, want %v", get, want)
+	if got != want {
+		t.Errorf("incorrect body: get %v, want %v", got, want)
 	}
 }
 
@@ -73,18 +66,11 @@ func Test_crwDocs_indexHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	r.ServeHTTP(rr, req)
 	if rr.Code != http.StatusNoContent {
-		t.Errorf("ncorrect code: get %d, want %d", rr.Code, http.StatusNoContent)
+		t.Errorf("incorrect code: get %d, want %d", rr.Code, http.StatusNoContent)
 	}
 
 	var indexView string
 	crw.docs = []crawler.Document{
-		{
-			ID:    0,
-			URL:   "https://golang.org/pkg",
-			Title: "src - The Go Programming Language",
-		},
-	}
-	wantDocs := []crawler.Document{
 		{
 			ID:    0,
 			URL:   "https://golang.org/pkg",
@@ -100,13 +86,13 @@ func Test_crwDocs_indexHandler(t *testing.T) {
 	}
 	resp := rr.Result()
 	body, _ := io.ReadAll(resp.Body)
-	get := string(body)
-	for i, d := range wantDocs {
+	got := string(body)
+	for i, d := range crw.docs {
 		indexView += "<p>" + fmt.Sprint(i, ": ", d.ID) + "</p>"
 	}
 	want := "<html><body><div>" + indexView + "</div></body></html>"
-	if get != want {
-		t.Errorf("incorrect body: get %v, want %v", get, want)
+	if got != want {
+		t.Errorf("incorrect body: get %v, want %v", got, want)
 	}
 }
 
