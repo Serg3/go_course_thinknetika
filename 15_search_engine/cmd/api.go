@@ -40,9 +40,10 @@ func (api *API) newDoc(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) doc(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	doc := findDoc(vars["id"])
+	id := mux.Vars(r)["id"]
+	doc := findDoc(id)
 	res := string(doc.URL + " - " + doc.Title + ": " + doc.Body)
+	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
 }
 
