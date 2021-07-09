@@ -26,4 +26,10 @@ var docs = []crawler.Document{
 		URL:   "https://google.com",
 		Title: "Search",
 	},
+	{
+		ID:    1,
+		URL:   "https://golang.org",
+		Title: "Go",
+		Body:  "programming",
+	},
 }

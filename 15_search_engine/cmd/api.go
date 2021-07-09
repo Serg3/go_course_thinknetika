@@ -28,7 +28,7 @@ func (api *API) docs(w http.ResponseWriter, r *http.Request) {
 }
 
 // curl -XPOST localhost:8000/api/v1/docs/new -H 'application/json' -d \
-//  '{"id":1,"url":"https://golang.org","title":"Go","body":"programming"}'
+//  '{"id":2,"url":"https://example.com","title":"Example"}'
 func (api *API) newDoc(w http.ResponseWriter, r *http.Request) {
 	d := crawler.Document{}
 	json.NewDecoder(r.Body).Decode(&d)
@@ -60,10 +60,12 @@ func (api *API) editDoc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&d)
 }
 
+// curl -XDELETE localhost:8000/api/v1/docs/0/delete
 func (api *API) deleteDoc(w http.ResponseWriter, r *http.Request) {
-	// vars := mux.Vars(r)
-	// doc := findDoc(vars["id"])
-	// append(docs[:doc.ID], docs[doc.ID+1:]...)
+	id := mux.Vars(r)["id"]
+	i, _ := findDoc(id)
+	docs = append(docs[:i], docs[i+1:]...)
+	w.WriteHeader(http.StatusOK)
 }
 
 func findDoc(id string) (int, crawler.Document) {
