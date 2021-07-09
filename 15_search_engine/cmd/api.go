@@ -22,21 +22,21 @@ func (api *API) Endpoints() {
 }
 
 func (api *API) docs(w http.ResponseWriter, r *http.Request) {
-	err := json.NewEncoder(w).Encode(docs)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(docs)
 }
 
 func (api *API) newDoc(w http.ResponseWriter, r *http.Request) {
-	// var b crawler.Document
-	// err := json.NewDecoder(r.Body).Decode(&b)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// docs = append(docs, b)
+	// curl -XPOST localhost:8000/api/v1/docs/new -H 'application/json' -d \
+	//  '{"id":1,"url":"https://golang.org","title":"Go","body":"programming"}'
+
+	d := crawler.Document{}
+	json.NewDecoder(r.Body).Decode(&d)
+	docs = append(docs, d)
+	response, _ := json.Marshal(&d)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	w.Write(response)
 }
 
 func (api *API) doc(w http.ResponseWriter, r *http.Request) {

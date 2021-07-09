@@ -23,7 +23,7 @@ func main() {
 var docs = []crawler.Document{
 	{
 		ID:    0,
-		URL:   "google.com",
-		Title: "search",
+		URL:   "https://google.com",
+		Title: "Search",
 	},
 }
