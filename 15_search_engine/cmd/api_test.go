@@ -1,11 +1,25 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"go_course_thinknetika/15_search_engine/pkg/crawler"
 	"net/http"
+	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/gorilla/mux"
 )
+
+var api *API
+
+func TestMain(m *testing.M) {
+	api = new(API)
+	api.router = mux.NewRouter()
+	api.Endpoints()
+	os.Exit(m.Run())
+}
 
 func TestAPI_docs(t *testing.T) {
 	type fields struct {
@@ -33,27 +47,25 @@ func TestAPI_docs(t *testing.T) {
 }
 
 func TestAPI_newDoc(t *testing.T) {
-	type fields struct {
-		router *mux.Router
+	data := crawler.Document{
+		ID:    0,
+		URL:   "https://google.com",
+		Title: "Search",
 	}
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+	payload, _ := json.Marshal(data)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/docs/new", bytes.NewBuffer(payload))
+	rr := httptest.NewRecorder()
+	api.router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusCreated {
+		t.Errorf("wrong code: got %d, want %d", rr.Code, http.StatusCreated)
 	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			api := &API{
-				router: tt.fields.router,
-			}
-			api.newDoc(tt.args.w, tt.args.r)
-		})
+	t.Log("Response: ", rr.Body)
+
+	got := docs[0]
+	want := data
+	if got != want {
+		t.Fatal("doc is not found")
 	}
 }
 
