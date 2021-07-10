@@ -17,8 +17,8 @@ func (api *API) Endpoints() {
 	api.router.HandleFunc("/api/v1/docs", api.docs).Methods(http.MethodGet, http.MethodOptions)
 	api.router.HandleFunc("/api/v1/docs/new", api.newDoc).Methods(http.MethodPost, http.MethodOptions)
 	api.router.HandleFunc("/api/v1/docs/{id}", api.doc).Methods(http.MethodGet, http.MethodOptions)
-	api.router.HandleFunc("/api/v1/docs/{id}/edit", api.editDoc).Methods(http.MethodPut, http.MethodOptions)
-	api.router.HandleFunc("/api/v1/docs/{id}/delete", api.deleteDoc).Methods(http.MethodDelete, http.MethodOptions)
+	api.router.HandleFunc("/api/v1/docs/{id}", api.editDoc).Methods(http.MethodPut, http.MethodOptions)
+	api.router.HandleFunc("/api/v1/docs/{id}", api.deleteDoc).Methods(http.MethodDelete, http.MethodOptions)
 }
 
 // curl localhost:8000/api/v1/docs
@@ -48,7 +48,7 @@ func (api *API) doc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(viewDoc)
 }
 
-// curl -XPUT localhost:8000/api/v1/docs/0/edit -H 'application/json' -d \
+// curl -XPUT localhost:8000/api/v1/docs/0 -H 'application/json' -d \
 //  '{"id":0,"url":"https://google.com","title":"Search","body":"information"}'
 func (api *API) editDoc(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
@@ -60,7 +60,7 @@ func (api *API) editDoc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&d)
 }
 
-// curl -XDELETE localhost:8000/api/v1/docs/0/delete
+// curl -XDELETE localhost:8000/api/v1/docs/0
 func (api *API) deleteDoc(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	i, _ := findDoc(id)

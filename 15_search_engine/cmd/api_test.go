@@ -83,7 +83,7 @@ func TestAPI_editDoc(t *testing.T) {
 		Body:  "body added",
 	}
 	payload, _ := json.Marshal(data)
-	req := httptest.NewRequest(http.MethodPut, "/api/v1/docs/0/edit", bytes.NewBuffer(payload))
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/docs/0", bytes.NewBuffer(payload))
 	rr := httptest.NewRecorder()
 	api.router.ServeHTTP(rr, req)
 
@@ -107,7 +107,7 @@ func TestAPI_deleteDoc(t *testing.T) {
 			Body:  "programming",
 		},
 	}
-	req := httptest.NewRequest(http.MethodDelete, "/api/v1/docs/0/delete", nil)
+	req := httptest.NewRequest(http.MethodDelete, "/api/v1/docs/0", nil)
 	rr := httptest.NewRecorder()
 	api.router.ServeHTTP(rr, req)
 
