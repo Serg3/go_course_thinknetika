@@ -29,7 +29,6 @@ func TestAPI_docs(t *testing.T) {
 	if rr.Code != http.StatusOK {
 		t.Errorf("wrong code: got %d, want %d", rr.Code, http.StatusOK)
 	}
-	t.Log("Response: ", rr.Body)
 }
 
 func TestAPI_newDoc(t *testing.T) {
@@ -44,64 +43,58 @@ func TestAPI_newDoc(t *testing.T) {
 	api.router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusCreated {
-		t.Errorf("wrong code: got %d, want %d", rr.Code, http.StatusCreated)
+		t.Errorf("error: got %d, want %d", rr.Code, http.StatusCreated)
 	}
-	t.Log("Response: ", rr.Body)
 
 	got := docs[0]
 	want := data
 	if got != want {
-		t.Fatal("doc is not found")
+		t.Errorf("error: got %v, want %v", got, want)
 	}
 }
 
 func TestAPI_doc(t *testing.T) {
-	type fields struct {
-		router *mux.Router
+	data := crawler.Document{
+		ID:    0,
+		URL:   "https://google.com",
+		Title: "Search",
 	}
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+	payload, _ := json.Marshal(data)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/docs/0", bytes.NewBuffer(payload))
+	rr := httptest.NewRecorder()
+	api.router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("wrong code: got %d, want %d", rr.Code, http.StatusOK)
 	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			api := &API{
-				router: tt.fields.router,
-			}
-			api.doc(tt.args.w, tt.args.r)
-		})
+
+	got := docs[0]
+	want := data
+	if got != want {
+		t.Errorf("error: got %v, want %v", got, want)
 	}
 }
 
 func TestAPI_editDoc(t *testing.T) {
-	type fields struct {
-		router *mux.Router
+	data := crawler.Document{
+		ID:    1,
+		URL:   "https://google.com",
+		Title: "Search",
+		Body:  "add a body",
 	}
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+	payload, _ := json.Marshal(data)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/docs/0/edit", bytes.NewBuffer(payload))
+	rr := httptest.NewRecorder()
+	api.router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("wrong code: got %d, want %d", rr.Code, http.StatusOK)
 	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			api := &API{
-				router: tt.fields.router,
-			}
-			api.editDoc(tt.args.w, tt.args.r)
-		})
+
+	got := docs[0]
+	want := data
+	if got != want {
+		t.Errorf("error: got %v, want %v", got, want)
 	}
 }
 
