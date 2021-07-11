@@ -16,7 +16,7 @@ func main() {
 	srv := new(server)
 	srv.router = mux.NewRouter()
 	srv.api = &API{router: srv.router}
-	srv.api.Endpoints()
+	srv.api.endpoints()
 	http.ListenAndServe(":8000", srv.router)
 }
 

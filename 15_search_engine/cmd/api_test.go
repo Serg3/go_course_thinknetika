@@ -17,7 +17,7 @@ var api *API
 func TestMain(m *testing.M) {
 	api = new(API)
 	api.router = mux.NewRouter()
-	api.Endpoints()
+	api.endpoints()
 	os.Exit(m.Run())
 }
 
@@ -38,7 +38,7 @@ func TestAPI_newDoc(t *testing.T) {
 		Title: "Search",
 	}
 	payload, _ := json.Marshal(data)
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/docs/new", bytes.NewBuffer(payload))
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/docs", bytes.NewBuffer(payload))
 	rr := httptest.NewRecorder()
 	api.router.ServeHTTP(rr, req)
 
