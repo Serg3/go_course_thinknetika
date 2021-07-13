@@ -12,12 +12,14 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
+// API's information structure.
 type API struct {
 	port   string
 	router *mux.Router
 	chat   *chat.Chat
 }
 
+// New creates API object.
 func New(port string, chat *chat.Chat) *API {
 	s := API{
 		port:   port,
@@ -27,6 +29,7 @@ func New(port string, chat *chat.Chat) *API {
 	return &s
 }
 
+// Run starts API.
 func (api *API) Run() {
 	api.endpoints()
 	http.ListenAndServe(api.port, api.router)
