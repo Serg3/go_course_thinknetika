@@ -14,6 +14,7 @@ type tokenClaims struct {
 	jwt.StandardClaims
 }
 
+// NewToken generates and returns a new token as []byte.
 func NewToken(usr *users.User) ([]byte, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		StandardClaims: jwt.StandardClaims{
@@ -32,6 +33,7 @@ func NewToken(usr *users.User) ([]byte, error) {
 	return []byte(tokenStr), nil
 }
 
+// VerifyToken checks if the token is valid.
 func VerifyToken(tokenStr string) (*tokenClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &tokenClaims{}, jwtKey)
 	if err != nil {

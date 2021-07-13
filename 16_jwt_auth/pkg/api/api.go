@@ -13,16 +13,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// API's information structure.
 type API struct {
 	router *mux.Router
 	users  *users.Users
 }
 
+// LogInfo is a struct for users' credentials.
 type LogInfo struct {
 	Usr string
 	Psw string
 }
 
+// New creates API object.
 func New() *API {
 	api := API{}
 	api.users = users.New()
@@ -34,6 +37,7 @@ func New() *API {
 	return &api
 }
 
+// Router returns API's router.
 func (api *API) Router() *mux.Router {
 	return api.router
 }
@@ -58,7 +62,7 @@ func (api *API) authentication(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usr := api.users.Search(log.Usr, log.Psw)
+	usr := api.users.User(log.Usr, log.Psw)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
