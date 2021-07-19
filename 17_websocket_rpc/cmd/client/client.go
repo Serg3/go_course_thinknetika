@@ -33,7 +33,6 @@ func (s *Service) dialog() {
 	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8000/send", nil)
 	if err != nil {
 		log.Fatalf("connection error to server: %v", err)
-		conn.Close()
 	}
 	defer conn.Close()
 
