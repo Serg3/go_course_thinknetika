@@ -1,5 +1,5 @@
-// package 'pg' is a movie management service
-package pg
+// package 'postgres' is a movie management service
+package postgres
 
 import (
 	"context"
@@ -58,8 +58,8 @@ func (p *PG) UpdateMovie(ctx context.Context, movie model.Movie) error {
 	return err
 }
 
-// SelectMovies returns a list of movies by StudioID or all movies if StudioID is not provided (= 0)
-func (p *PG) SelectMovies(ctx context.Context, StudioID int) ([]model.Movie, error) {
+// Movies returns a list of movies by StudioID or all movies if StudioID is not provided (= 0)
+func (p *PG) Movies(ctx context.Context, StudioID int) ([]model.Movie, error) {
 	var movies []model.Movie
 	var err error
 	var rows pgx.Rows
@@ -67,7 +67,7 @@ func (p *PG) SelectMovies(ctx context.Context, StudioID int) ([]model.Movie, err
 	rows, err = p.pool.Query(ctx, "SELECT * from MOVIES WHERE studio_id = $1 OR $1 = 0", StudioID)
 
 	if err != nil {
-		return movies, err
+		return nil, err
 	}
 
 	for rows.Next() {
@@ -81,14 +81,14 @@ func (p *PG) SelectMovies(ctx context.Context, StudioID int) ([]model.Movie, err
 			&m.StudioID,
 		)
 		if err != nil {
-			return movies, err
+			return nil, err
 		}
 		movies = append(movies, m)
 	}
 
 	err = rows.Err()
 	if err != nil {
-		return movies, err
+		return nil, err
 	}
 
 	return movies, nil

@@ -11,5 +11,5 @@ type DB interface {
 	InsertMovies(context.Context, []model.Movie) error
 	DeleteMovie(context.Context, int) error
 	UpdateMovie(context.Context, model.Movie) error
-	SelectMovies(context.Context, int) ([]model.Movie, error)
+	Movies(context.Context, int) ([]model.Movie, error)
 }

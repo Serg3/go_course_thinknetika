@@ -1,4 +1,4 @@
-package pg
+package postgres
 
 import (
 	"context"
@@ -64,10 +64,10 @@ func TestPG_UpdateMovie(t *testing.T) {
 	_ = pg.UpdateMovie(ctx, movie)
 }
 
-func TestPG_SelectMovies(t *testing.T) {
-	movies, err := pg.SelectMovies(ctx, 0)
+func TestPG_Movies(t *testing.T) {
+	movies, err := pg.Movies(ctx, 0)
 	if err != nil {
-		t.Errorf("pg.SelectMovies(); err = %v, want %v", err, nil)
+		t.Errorf("pg.Movies(); err = %v, want %v", err, nil)
 	}
 
 	var ids []int
@@ -83,10 +83,10 @@ func TestPG_SelectMovies(t *testing.T) {
 	}
 }
 
-func TestPG_SelectMovies_by_studio(t *testing.T) {
-	movies, err := pg.SelectMovies(ctx, 2)
+func TestPG_Movies_by_studio(t *testing.T) {
+	movies, err := pg.Movies(ctx, 2)
 	if err != nil {
-		t.Errorf("pg.SelectMovies(); err = %v, want %v", err, nil)
+		t.Errorf("pg.Movies(); err = %v, want %v", err, nil)
 	}
 
 	var ids []int
